@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">SmartHome</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="cameras">Камеры</string>
+    <string name="doors">Двери</string>
+    <string name="my_home">Мой дом</string>
+    <string name="living_room">Гостиная</string>
+    <string name="online">В сети</string>
+</resources>

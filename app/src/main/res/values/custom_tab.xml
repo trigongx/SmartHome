@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomTab" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
+        <item name="android:textColor">@color/default_text_color</item>
+        <item name="android:textSize">@dimen/_16sp</item>
+        <item name="android:fontFamily">@font/circe_regular</item>
+    </style>
+</resources>
