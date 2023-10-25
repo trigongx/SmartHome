@@ -1,15 +1,25 @@
 package com.example.smart_home.presentation.doors
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.example.smart_home.data.model.DoorModel
 import com.example.smart_home.databinding.ItemRvDoorsBinding
 
-class DoorAdapter(private val itemList: ArrayList<DoorModel>) :
+class DoorAdapter :
     RecyclerView.Adapter<DoorAdapter.DoorViewHolder>() {
+
+    private var list = mutableListOf<DoorModel.Data>()
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun addData(doors:List<DoorModel.Data>){
+        list.clear()
+        list.addAll(doors)
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoorViewHolder {
         return DoorViewHolder(
@@ -21,29 +31,29 @@ class DoorAdapter(private val itemList: ArrayList<DoorModel>) :
         )
     }
 
-    override fun getItemCount() = itemList.size
+    override fun getItemCount() = list.size
 
     override fun onBindViewHolder(holder: DoorViewHolder, position: Int) {
-        holder.toBind(itemList[position])
+        holder.toBind(list[position])
     }
 
     fun doFavoriteItem(adapterPosition: Int) {
-        val item = itemList.removeAt(adapterPosition)
-        itemList.add(0, item)
+        val item = list.removeAt(adapterPosition)
+        list.add(0, item)
         notifyItemMoved(adapterPosition, 0)
     }
 
     fun editItem(adapterPosition: Int) {
-        itemList.removeAt(adapterPosition)
+        list.removeAt(adapterPosition)
         notifyItemRemoved(adapterPosition)
     }
 
     inner class DoorViewHolder(private val binding: ItemRvDoorsBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun toBind(doorModel: DoorModel) {
-            binding.tvNameDoor.text = doorModel.nameDoor
-            binding.imgDoor.setImageResource(doorModel.image)
-            binding.tvIsOnline.text = doorModel.isOnline
+        fun toBind(door: DoorModel.Data) {
+            binding.tvNameDoor.text = door.name
+            binding.imgDoor.load(door.snapshot)
+            binding.tvIsOnline.text = "В сети"
             itemView.setOnClickListener {
                 if(binding.imgDoor.visibility == View.GONE && binding.btnPlay.visibility == View.GONE){
                     showDetails()
