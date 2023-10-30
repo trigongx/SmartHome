@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.example.smart_home.data.model.DoorModel
+import com.example.smart_home.domain.models.DoorModel
 import com.example.smart_home.databinding.ItemRvDoorsBinding
 
 class DoorAdapter :

@@ -5,14 +5,21 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.example.smart_home.core.base.BaseFragment
+import com.example.smart_home.core.network.RetrofitClient
+import com.example.smart_home.data.repositories.RetrofitRepositoryImpl
+import com.example.smart_home.data.storage.RetrofitStorageImpl
 import com.example.smart_home.databinding.FragmentCamerasBinding
-import com.example.smart_home.presentation.activity.MainActivity
+import com.example.smart_home.domain.usecases.GetAllCamerasUseCase
 
 class CamerasFragment : BaseFragment<FragmentCamerasBinding, CamerasViewModel>() {
+
+    private val retrofitRepository = RetrofitRepositoryImpl(RetrofitStorageImpl(RetrofitClient().createApiService()))
+
+    private val getAllCamerasUseCase = GetAllCamerasUseCase(retrofitRepository)
     override fun inflateViewBinding(): FragmentCamerasBinding =
         FragmentCamerasBinding.inflate(layoutInflater)
 
-    override fun setViewModel(): CamerasViewModel = CamerasViewModel(MainActivity.repository)
+    override fun setViewModel(): CamerasViewModel = CamerasViewModel(getAllCamerasUseCase)
 
     private val adapter = CameraAdapter()
 
@@ -48,6 +55,4 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding, CamerasViewModel>()
     private fun initRequest() {
         viewModel.getCameras()
     }
-
-
 }

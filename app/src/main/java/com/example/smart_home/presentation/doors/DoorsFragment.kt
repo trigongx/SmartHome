@@ -9,15 +9,22 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smart_home.R
 import com.example.smart_home.core.base.BaseFragment
+import com.example.smart_home.core.network.RetrofitClient
+import com.example.smart_home.data.repositories.RetrofitRepositoryImpl
+import com.example.smart_home.data.storage.RetrofitStorageImpl
 import com.example.smart_home.databinding.FragmentDoorsBinding
+import com.example.smart_home.domain.usecases.GetAllDoorsUseCase
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
 
 
 class DoorsFragment : BaseFragment<FragmentDoorsBinding, DoorsViewModel>() {
+    private val retrofitRepository = RetrofitRepositoryImpl(RetrofitStorageImpl(RetrofitClient().createApiService()))
+
+    private val getAllDoorsUseCase = GetAllDoorsUseCase(retrofitRepository)
     override fun inflateViewBinding(): FragmentDoorsBinding =
         FragmentDoorsBinding.inflate(layoutInflater)
 
-    override fun setViewModel(): DoorsViewModel = DoorsViewModel()
+    override fun setViewModel(): DoorsViewModel = DoorsViewModel(getAllDoorsUseCase)
     private val adapter = DoorAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -1,6 +1,6 @@
-package com.example.smart_home.data.model
+package com.example.smart_home.data.storage.models
 
-data class DoorModel(
+data class DoorModelDTO(
     val `data`: List<Data>,
     val success: Boolean
 ) {

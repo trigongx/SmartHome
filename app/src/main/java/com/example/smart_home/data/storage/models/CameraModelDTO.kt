@@ -1,6 +1,6 @@
-package com.example.smart_home.data.model
+package com.example.smart_home.data.storage.models
 
-data class CameraModel(
+data class CameraModelDTO(
     val `data`: Data,
     val success: Boolean
 ) {

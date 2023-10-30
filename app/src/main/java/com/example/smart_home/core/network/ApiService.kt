@@ -1,14 +1,14 @@
 package com.example.smart_home.core.network
 
-import com.example.smart_home.data.model.CameraModel
-import com.example.smart_home.data.model.DoorModel
+import com.example.smart_home.data.storage.models.CameraModelDTO
+import com.example.smart_home.data.storage.models.DoorModelDTO
 import retrofit2.Response
 import retrofit2.http.GET
 
 interface ApiService {
     @GET("cameras")
-    suspend fun getCameras(): Response<CameraModel>
+    suspend fun getCameras(): Response<CameraModelDTO>
 
     @GET("doors")
-    suspend fun getDoors(): Response<DoorModel>
+    suspend fun getDoors(): Response<DoorModelDTO>
 }
