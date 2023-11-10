@@ -1,9 +1,8 @@
 package com.example.smart_home.domain.usecases
 
-import com.example.smart_home.domain.repositories.NoteRepository
-import javax.inject.Inject
+import com.example.smart_home.domain.repositories.RetrofitRepository
 
-class GetAllNotesUseCase @Inject constructor(private val noteRepository: NoteRepository) {
+class GetAllNotesUseCase (private val retrofitRepository: RetrofitRepository) {
 
-    suspend fun getAllNotes() = noteRepository.getAllNotes()
+    suspend fun executeRequest() = retrofitRepository.getAllNotes()
 }

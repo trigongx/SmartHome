@@ -1,4 +1,4 @@
-package com.example.smart_home.data.storage.models
+package com.example.smart_home.data.remote.storage.models
 
 data class CameraModelDTO(
     val `data`: Data,

@@ -1,4 +1,4 @@
-package com.example.smart_home.core.network
+package com.example.smart_home.data.remote.network
 
 
 import com.example.smart_home.BuildConfig

@@ -1,27 +1,24 @@
 package com.example.smart_home.presentation.cameras
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.smart_home.core.base.BaseFragment
-import com.example.smart_home.core.network.RetrofitClient
-import com.example.smart_home.data.repositories.RetrofitRepositoryImpl
-import com.example.smart_home.data.storage.RetrofitStorageImpl
 import com.example.smart_home.databinding.FragmentCamerasBinding
-import com.example.smart_home.domain.usecases.GetAllCamerasUseCase
+import com.example.smart_home.presentation.utils.UiState
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
-class CamerasFragment : BaseFragment<FragmentCamerasBinding, CamerasViewModel>() {
+@AndroidEntryPoint
+class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
 
-    private val retrofitRepository = RetrofitRepositoryImpl(RetrofitStorageImpl(RetrofitClient().createApiService()))
-
-    private val getAllCamerasUseCase = GetAllCamerasUseCase(retrofitRepository)
-    override fun inflateViewBinding(): FragmentCamerasBinding =
-        FragmentCamerasBinding.inflate(layoutInflater)
-
-    override fun setViewModel(): CamerasViewModel = CamerasViewModel(getAllCamerasUseCase)
+    private val viewModel:CamerasViewModel by viewModels()
 
     private val adapter = CameraAdapter()
+    override fun inflateViewBinding(): FragmentCamerasBinding =
+        FragmentCamerasBinding.inflate(layoutInflater)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -34,25 +31,32 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding, CamerasViewModel>()
     }
 
     override fun initLiveData() {
-        viewModel.cameras.observe(viewLifecycleOwner) { cameras ->
-            Log.e("denn", "initLiveData: ${cameras.data.cameras}")
-            adapter.addData(cameras.data.cameras)
-        }
-        viewModel.error.observe(viewLifecycleOwner) { error ->
-            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
-        }
-        viewModel.loading.observe(viewLifecycleOwner) { loading ->
-            if (loading){
-                binding.shimmer.startShimmer()
-                binding.shimmer.visibility = View.VISIBLE
-            } else{
-                binding.shimmer.stopShimmer()
-                binding.shimmer.visibility = View.GONE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.viewState.collect{
+                when (it){
+                    is UiState.Loading -> {
+                        binding.shimmer.startShimmer()
+                        binding.shimmer.visibility = View.VISIBLE
+                    }
+                    is UiState.Success -> {
+                        binding.shimmer.stopShimmer()
+                        binding.shimmer.visibility = View.GONE
+                        adapter.addData(it.data?.data?.cameras!!)
+                    }
+                    is UiState.Empty -> {
+                        Toast.makeText(requireContext(), "Empty", Toast.LENGTH_SHORT).show()
+                    }
+                    is UiState.Error -> {
+                        Toast.makeText(requireContext(), "${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+
+                }
             }
         }
     }
 
+
     private fun initRequest() {
-        viewModel.getCameras()
+        viewLifecycleOwner.lifecycleScope.launch{viewModel.getCameras()}
     }
 }

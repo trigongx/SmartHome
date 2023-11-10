@@ -5,27 +5,26 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.smart_home.R
 import com.example.smart_home.core.base.BaseFragment
-import com.example.smart_home.core.network.RetrofitClient
-import com.example.smart_home.data.repositories.RetrofitRepositoryImpl
-import com.example.smart_home.data.storage.RetrofitStorageImpl
 import com.example.smart_home.databinding.FragmentDoorsBinding
-import com.example.smart_home.domain.usecases.GetAllDoorsUseCase
+import com.example.smart_home.presentation.utils.UiState
+import dagger.hilt.android.AndroidEntryPoint
 import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator
+import kotlinx.coroutines.launch
 
 
-class DoorsFragment : BaseFragment<FragmentDoorsBinding, DoorsViewModel>() {
-    private val retrofitRepository = RetrofitRepositoryImpl(RetrofitStorageImpl(RetrofitClient().createApiService()))
+@AndroidEntryPoint
+class DoorsFragment : BaseFragment<FragmentDoorsBinding>() {
 
-    private val getAllDoorsUseCase = GetAllDoorsUseCase(retrofitRepository)
+    private val viewModel:DoorsViewModel by viewModels()
+    private val adapter = DoorAdapter()
     override fun inflateViewBinding(): FragmentDoorsBinding =
         FragmentDoorsBinding.inflate(layoutInflater)
-
-    override fun setViewModel(): DoorsViewModel = DoorsViewModel(getAllDoorsUseCase)
-    private val adapter = DoorAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -115,23 +114,30 @@ class DoorsFragment : BaseFragment<FragmentDoorsBinding, DoorsViewModel>() {
     }
 
     private fun initRequest() {
-        viewModel.getDoors()
+        viewLifecycleOwner.lifecycleScope.launch { viewModel.getDoors() }
     }
 
     override fun initLiveData() {
-        viewModel.doors.observe(viewLifecycleOwner) { doors ->
-            adapter.addData(doors.data)
-        }
-        viewModel.error.observe(viewLifecycleOwner) { error ->
-            Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
-        }
-        viewModel.loading.observe(viewLifecycleOwner){loading ->
-            if (loading){
-                binding.shimmer.startShimmer()
-                binding.shimmer.visibility = View.VISIBLE
-            } else{
-                binding.shimmer.stopShimmer()
-                binding.shimmer.visibility = View.GONE
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.viewState.collect{
+                when (it){
+                    is UiState.Loading -> {
+                        binding.shimmer.startShimmer()
+                        binding.shimmer.visibility = View.VISIBLE
+                    }
+                    is UiState.Success -> {
+                        binding.shimmer.stopShimmer()
+                        binding.shimmer.visibility = View.GONE
+                        adapter.addData(it.data!!.data)
+                    }
+                    is UiState.Empty -> {
+                        Toast.makeText(requireContext(), "Empty", Toast.LENGTH_SHORT).show()
+                    }
+                    is UiState.Error -> {
+                        Toast.makeText(requireContext(), "${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+
+                }
             }
         }
     }

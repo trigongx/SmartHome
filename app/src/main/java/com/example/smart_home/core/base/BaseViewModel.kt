@@ -1,35 +1,35 @@
 package com.example.smart_home.core.base
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.smart_home.domain.utils.Resource
+import com.example.smart_home.presentation.utils.UiState
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
-open class BaseViewModel:ViewModel() {
-    private val _loading = MutableLiveData<Boolean>()
-    val loading:LiveData<Boolean> = _loading
+open class BaseViewModel<T>:ViewModel() {
+    private var _viewState = MutableStateFlow<UiState<T>>(UiState.Empty())
+    val viewState: StateFlow<UiState<T>> = _viewState.asStateFlow()
 
-    private val _error = MutableLiveData<String>()
-    val error: LiveData<String> get() = _error
-
-    fun<T> doOperation(
-        operation:suspend () -> Result<T>,
-        success: (T) -> Unit
+    protected suspend fun doOperation(
+        operation: suspend () -> Flow<Resource<T>>
     ){
-        viewModelScope.launch(Dispatchers.IO) {
-            _loading.postValue(true)
-            val result = operation()
-            when{
-                result.isSuccess -> { result.onSuccess(success) }
-                result.isFailure -> {
-                    result.onFailure {throwable ->
-                        if (!throwable.message.isNullOrEmpty())
-                            _error.postValue(throwable.message) }
-                }
+        val dataResult = operation()
+        dataResult.onEach {
+            when (it) {
+                is Resource.Loading -> _viewState.value = UiState.Loading()
+                is Resource.Success ->
+                    if (it.data == null){
+                        _viewState.value = UiState.Empty()
+                    } else {
+                        _viewState.value = UiState.Success(it.data)
+                    }
+                is Resource.Error -> _viewState.value = UiState.Error(it.message?:"Some error")
             }
-            _loading.postValue(false)
-        }
+        }.launchIn(viewModelScope)
     }
 }

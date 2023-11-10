@@ -6,26 +6,26 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.smart_home.data.storage.models.Note
+import com.example.smart_home.data.local.storage.models.NoteDTO
 
 @Dao
 interface NoteDao {
 
     @Query("SELECT * FROM notes")
-    fun getAllNotes():List<Note>
+    fun getAllNotes():List<NoteDTO>
 
     @Query("SELECT * FROM notes WHERE title ==:title")
-    fun getAllNotesByTitle(title:String):List<Note>
+    fun getAllNotesByTitle(title:String):List<NoteDTO>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertNote(note: Note)
+    fun insertNote(noteDTO: NoteDTO)
 
     @Insert
-    fun insertAllNotes(notes: List<Note>)
+    fun insertAllNotes(noteDTOS: List<NoteDTO>)
 
     @Update
-    fun updateNote(note: Note)
+    fun updateNote(noteDTO: NoteDTO)
 
     @Delete
-    fun deleteNote(note: Note)
+    fun deleteNote(noteDTO: NoteDTO)
 }

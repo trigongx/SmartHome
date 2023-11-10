@@ -1,37 +1,57 @@
 package com.example.smart_home.data.repositories
 
-import com.example.smart_home.data.storage.RetrofitStorage
-import com.example.smart_home.data.storage.models.CameraModelDTO
-import com.example.smart_home.data.storage.models.DoorModelDTO
+import com.example.smart_home.data.local.storage.RoomStorage
+import com.example.smart_home.data.remote.storage.RetrofitStorage
+import com.example.smart_home.data.utils.mapToCameraModel
+import com.example.smart_home.data.utils.mapToDoorsModel
+import com.example.smart_home.data.utils.mapToNote
 import com.example.smart_home.domain.models.CameraModel
 import com.example.smart_home.domain.models.DoorModel
+import com.example.smart_home.domain.models.Note
 import com.example.smart_home.domain.repositories.RetrofitRepository
+import com.example.smart_home.domain.utils.Resource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
-class RetrofitRepositoryImpl(private val retrofitStorage: RetrofitStorage): RetrofitRepository {
+class RetrofitRepositoryImpl(
+    private val retrofitStorage: RetrofitStorage,
+    private val roomStorage: RoomStorage
+) : RetrofitRepository {
 
-    override suspend fun getCameras(): Result<CameraModel> {
-        return mapToCameraModel(retrofitStorage.getCameras())
-    }
-
-    override suspend fun getDoors(): Result<DoorModel> {
-        return mapToDoorModel(retrofitStorage.getDoors())
-    }
-
-    private fun mapToDoorModel(doorsModel: DoorModelDTO): Result<DoorModel> {
-        val doorsModelData = mutableListOf<DoorModel.Data>()
-        doorsModel.data.mapTo(doorsModelData){
-            DoorModel.Data(it.favorites,it.id,it.name,it.room?:"",it.snapshot)
+    override suspend fun getCameras(): Flow<Resource<CameraModel>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val data = retrofitStorage.getCameras().mapToCameraModel()
+                emit(Resource.Success(data))
+            } catch (e: Exception) {
+                emit(Resource.Error(e.localizedMessage))
+            }
         }
-        return Result.success(DoorModel(doorsModelData,doorsModel.success))
     }
 
-    private fun mapToCameraModel(cameraModel: CameraModelDTO): Result<CameraModel> {
-        val camerasModelDataCameras = mutableListOf<CameraModel.Data.Camera>()
-        cameraModel.data.cameras.mapTo(camerasModelDataCameras){
-            CameraModel.Data.Camera(it.favorites,it.id,it.name,it.rec,it.room?:"",it.snapshot)
+    override suspend fun getDoors(): Flow<Resource<DoorModel>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val data = retrofitStorage.getDoors().mapToDoorsModel()
+                emit(Resource.Success(data))
+            } catch (e: Exception) {
+                emit(Resource.Error(e.localizedMessage))
+            }
         }
-        val camerasModelData = CameraModel.Data(camerasModelDataCameras.toList(),cameraModel.data.room)
-        return Result.success(CameraModel(camerasModelData,cameraModel.success))
+    }
+
+    override suspend fun getAllNotes(): Flow<Resource<List<Note>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val data = roomStorage.getAllNotes().mapToNote()
+                emit(Resource.Success(data))
+            } catch (e: Exception) {
+                emit(Resource.Error(e.localizedMessage))
+            }
+        }
     }
 
 
