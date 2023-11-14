@@ -1,6 +1,6 @@
 package com.example.smart_home.core.di
 
-import com.example.smart_home.domain.repositories.RetrofitRepository
+import com.example.smart_home.domain.repository.RetrofitRepository
 import com.example.smart_home.domain.usecases.GetAllCamerasUseCase
 import com.example.smart_home.domain.usecases.GetAllDoorsUseCase
 import com.example.smart_home.domain.usecases.GetAllNotesUseCase

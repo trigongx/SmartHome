@@ -21,6 +21,17 @@ class CameraAdapter :
         notifyDataSetChanged()
     }
 
+    fun doFavoriteItem(adapterPosition: Int) {
+        val item = list.removeAt(adapterPosition)
+        list.add(0, item)
+        notifyItemMoved(adapterPosition, 0)
+    }
+
+    fun deleteItem(adapterPosition: Int) {
+        list.removeAt(adapterPosition)
+        notifyItemRemoved(adapterPosition)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CameraViewHolder {
         return CameraViewHolder(
             ItemRvCamerasBinding.inflate(

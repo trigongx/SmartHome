@@ -5,8 +5,8 @@ import com.example.smart_home.data.remote.network.ApiService
 import com.example.smart_home.data.remote.network.RetrofitClient
 import com.example.smart_home.data.remote.storage.RetrofitStorage
 import com.example.smart_home.data.remote.storage.RetrofitStorageImpl
-import com.example.smart_home.data.repositories.RetrofitRepositoryImpl
-import com.example.smart_home.domain.repositories.RetrofitRepository
+import com.example.smart_home.data.repository.RetrofitRepositoryImpl
+import com.example.smart_home.domain.repository.RetrofitRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

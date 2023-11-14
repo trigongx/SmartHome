@@ -1,4 +1,4 @@
-package com.example.smart_home.data.repositories
+package com.example.smart_home.data.repository
 
 import com.example.smart_home.data.local.storage.RoomStorage
 import com.example.smart_home.data.remote.storage.RetrofitStorage
@@ -8,7 +8,7 @@ import com.example.smart_home.data.utils.mapToNote
 import com.example.smart_home.domain.models.CameraModel
 import com.example.smart_home.domain.models.DoorModel
 import com.example.smart_home.domain.models.Note
-import com.example.smart_home.domain.repositories.RetrofitRepository
+import com.example.smart_home.domain.repository.RetrofitRepository
 import com.example.smart_home.domain.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

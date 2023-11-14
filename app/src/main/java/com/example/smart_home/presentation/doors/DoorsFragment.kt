@@ -1,5 +1,6 @@
 package com.example.smart_home.presentation.doors
 
+import android.annotation.SuppressLint
 import android.graphics.Canvas
 import android.os.Bundle
 import android.view.View
@@ -21,7 +22,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class DoorsFragment : BaseFragment<FragmentDoorsBinding>() {
 
-    private val viewModel:DoorsViewModel by viewModels()
+    private val viewModel: DoorsViewModel by viewModels()
     private val adapter = DoorAdapter()
     override fun inflateViewBinding(): FragmentDoorsBinding =
         FragmentDoorsBinding.inflate(layoutInflater)
@@ -39,9 +40,15 @@ class DoorsFragment : BaseFragment<FragmentDoorsBinding>() {
                 TODO("Not yet implemented")
             }
 
+            @SuppressLint("NotifyDataSetChanged")
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                if (direction == ItemTouchHelper.LEFT) adapter.editItem(viewHolder.adapterPosition)
-                if (direction == ItemTouchHelper.RIGHT) adapter.doFavoriteItem(viewHolder.adapterPosition)
+                val position = viewHolder.absoluteAdapterPosition
+                if (direction == ItemTouchHelper.LEFT) {
+                    adapter.deleteItem(position)
+                } else if (direction == ItemTouchHelper.RIGHT) {
+                    adapter.doFavoriteItem(position)
+                }
+                adapter.notifyDataSetChanged()
             }
 
             override fun onChildDraw(
@@ -89,7 +96,7 @@ class DoorsFragment : BaseFragment<FragmentDoorsBinding>() {
                                     R.color.grey
                                 )
                             )
-                            .addActionIcon(R.drawable.ic_edit)
+                            .addActionIcon(R.drawable.ic_delete)
                             .create()
                             .decorate()
                     }
@@ -119,20 +126,23 @@ class DoorsFragment : BaseFragment<FragmentDoorsBinding>() {
 
     override fun initLiveData() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.viewState.collect{
-                when (it){
+            viewModel.viewState.collect {
+                when (it) {
                     is UiState.Loading -> {
                         binding.shimmer.startShimmer()
                         binding.shimmer.visibility = View.VISIBLE
                     }
+
                     is UiState.Success -> {
                         binding.shimmer.stopShimmer()
                         binding.shimmer.visibility = View.GONE
                         adapter.addData(it.data!!.data)
                     }
+
                     is UiState.Empty -> {
                         Toast.makeText(requireContext(), "Empty", Toast.LENGTH_SHORT).show()
                     }
+
                     is UiState.Error -> {
                         Toast.makeText(requireContext(), "${it.message}", Toast.LENGTH_SHORT).show()
                     }

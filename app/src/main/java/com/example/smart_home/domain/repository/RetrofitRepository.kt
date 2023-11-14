@@ -1,4 +1,4 @@
-package com.example.smart_home.domain.repositories
+package com.example.smart_home.domain.repository
 
 import com.example.smart_home.domain.models.CameraModel
 import com.example.smart_home.domain.models.DoorModel

@@ -15,10 +15,20 @@ class DoorAdapter :
     private var list = mutableListOf<DoorModel.Data>()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun addData(doors:List<DoorModel.Data>){
+    fun addData(doors: List<DoorModel.Data>) {
         list.clear()
         list.addAll(doors)
         notifyDataSetChanged()
+    }
+    fun doFavoriteItem(adapterPosition: Int) {
+        val item = list.removeAt(adapterPosition)
+        list.add(0, item)
+        notifyItemMoved(adapterPosition, 0)
+    }
+
+    fun deleteItem(adapterPosition: Int) {
+        list.removeAt(adapterPosition)
+        notifyItemRemoved(adapterPosition)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DoorViewHolder {
@@ -37,17 +47,6 @@ class DoorAdapter :
         holder.toBind(list[position])
     }
 
-    fun doFavoriteItem(adapterPosition: Int) {
-        val item = list.removeAt(adapterPosition)
-        list.add(0, item)
-        notifyItemMoved(adapterPosition, 0)
-    }
-
-    fun editItem(adapterPosition: Int) {
-        list.removeAt(adapterPosition)
-        notifyItemRemoved(adapterPosition)
-    }
-
     inner class DoorViewHolder(private val binding: ItemRvDoorsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun toBind(door: DoorModel.Data) {
@@ -55,7 +54,7 @@ class DoorAdapter :
             binding.imgDoor.load(door.snapshot)
             binding.tvIsOnline.text = "В сети"
             itemView.setOnClickListener {
-                if(binding.imgDoor.visibility == View.GONE && binding.btnPlay.visibility == View.GONE){
+                if (binding.imgDoor.visibility == View.GONE && binding.btnPlay.visibility == View.GONE) {
                     showDetails()
                 } else {
                     hideDetails()
