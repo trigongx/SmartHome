@@ -150,7 +150,16 @@ class CamerasFragment : BaseFragment<FragmentCamerasBinding>() {
     }
 
 
-    private fun initRequest() {
+    private fun initRequest(){
         viewLifecycleOwner.lifecycleScope.launch { viewModel.getCameras() }
+    }
+
+    override fun initListener() {
+        super.initListener()
+        binding.swipeRefresh.setOnRefreshListener {
+            initRequest()
+            initLiveData()
+            binding.swipeRefresh.isRefreshing = false
+        }
     }
 }

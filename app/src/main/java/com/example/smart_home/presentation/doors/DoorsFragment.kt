@@ -152,4 +152,13 @@ class DoorsFragment : BaseFragment<FragmentDoorsBinding>() {
         }
     }
 
+    override fun initListener() {
+        super.initListener()
+        binding.swipeRefresh.setOnRefreshListener {
+            initRequest()
+            initLiveData()
+            binding.swipeRefresh.isRefreshing = false
+        }
+    }
+
 }
